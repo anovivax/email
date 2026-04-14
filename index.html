@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องมือจัดการบัญชี & 2FA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;      
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;     
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --border-color: #e5e7eb;
+            --input-bg: #f9fafb;
+            --tag-bg: #f3f4f6;
+            --tag-text: #6b7280;
+            --email-btn: #3b82f6;    
+            --pass-btn: #8b5cf6;     
+            --link-btn: #0ea5e9;     
+            --success: #10b981;      
+            --visited: #64748b;      
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #111827;     
+            --card-bg: #1f2937;      
+            --text-main: #f9fafb;    
+            --border-color: #374151; 
+            --input-bg: #374151;     
+            --tag-bg: #374151;       
+            --tag-text: #d1d5db;     
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 30px 15px;
+            color: var(--text-main);
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Prompt', monospace;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .btn-generate {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+
+        .search-container {
+            display: none;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 14px;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .search-container input:focus { border-color: var(--primary); }
+        .btn-search { background-color: var(--primary); color: white; border: none; border-radius: 8px; padding: 0 20px; cursor: pointer; }
+        .btn-clear { background-color: var(--tag-text); color: white; border: none; border-radius: 8px; padding: 0 20px; cursor: pointer; }
+
+        .group-wrapper { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+        .group-header, .group-footer { background-color: var(--input-bg); padding: 15px 20px; font-weight: 600; cursor: pointer; display: flex; align-items: center; user-select: none; }
+        .group-header { justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+        .group-footer { justify-content: center; border-top: 1px solid var(--border-color); color: var(--tag-text); font-size: 14px; }
+        .group-header:hover, .group-footer:hover { background-color: var(--border-color); }
+        .group-content { padding: 20px; }
+        .group-wrapper.is-collapsed .group-content, .group-wrapper.is-collapsed .group-footer { display: none; }
+        .group-wrapper.is-collapsed .group-header { border-bottom: none; }
+        
+        .account-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .account-card:last-child { margin-bottom: 0; }
+
+        .button-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .button-group button { padding: 12px 10px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt', sans-serif; font-weight: 500; transition: all 0.2s; }
+
+        .btn-email { background-color: var(--email-btn); color: white; }
+        .btn-pass { background-color: var(--pass-btn); color: white; }
+        .btn-link { background-color: var(--link-btn); color: white; }
+
+        .copied { background-color: var(--success) !important; color: white !important; }
+        .visited { background-color: var(--visited) !important; color: white !important; }
+
+        .theme-toggle { background: none; border: none; font-size: 24px; cursor: pointer; }
+        .no-result { text-align: center; color: var(--tag-text); padding: 30px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-top">
+        <h2>✨ เครื่องมือจัดการข้อมูล & ค้นหา</h2>
+        <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </div>
+    
+    <textarea id="inputText" placeholder="วางข้อมูลที่นี่...">
+(Email) zugolulu26@gmail.com  
+(Pass) OXiIcrdPBH7aFui  
+(Link) https://2fa.fb.tools/N4YXMRR7LM4P56JCT2O7KHE7B22B45DE  
+
+(Email) koqewujos25@gmail.com  
+(Pass) UQMIY1cWvuv6YLb  
+(Link) https://2fa.fb.tools/BQ56XB4FGLL4OKKHXJEK6LXFPOUULXEN  
+
+(Email) onacatahawo41@gmail.com  
+(Pass) YpEsLUGPSdrFJ  
+(Link) https://2fa.fb.tools/ZJTVMUB4UAS5K46FM22UINFUPVOUGXET  
+(Email) okisefowuw175@gmail.com  
+(Pass) rCJ91LOhdFbrs  
+(Link) https://2fa.fb.tools/6KWSEQXL3TEABMR2SIIXVJ46R67MT4CC  
+
+(Email) axokafatidi276@gmail.com  
+(Pass) 8CQx49yK3cneo  
+(Link) https://2fa.fb.tools/JCKHGICUS53I4OU6GMETCK37ALFKIZWU  
+
+(Email) qeyalituce401@gmail.com  
+(Pass) SKrQVnO2PVu6Q  
+(Link) https://2fa.fb.tools/7FHO6D3R3ZW3FAVAQQA7VD6EJYOZRR2L  
+➖➖➖➖➖➖➖➖
+(Email) ebohedo488@gmail.com  
+(Pass) jcPzxvtZw0cyN  
+(Link) https://2fa.fb.tools/YK6TCSRBPUE2PREHRXY3DK3LDGQPQTCD  
+
+(Email) kucunofo490@gmail.com  
+(Pass) 9I1EiwYngFovmA  
+(Link) https://2fa.fb.tools/5IPFMMT7AV5U7U4ZVBSLBEJS37NLO3EM  
+
+(Email) xometixiw020@gmail.com  
+(Pass) LLvrZLeXzHMTVhj  
+(Link) https://2fa.fb.tools/PUKWQEZ5FDD4Z5OIS7TLZNDEYI55H45I  
+
+(Email) efekukipo841@gmail.com  
+(Pass) ZioAC0O0XcMK  
+(Link) https://2fa.fb.tools/MKXMBEHOPBLAL2RUMYEVARSYRQQ5DQ27  
+
+(Email) cepodabili23@gmail.com  
+(Pass) VSAcTN2jsVzY0J  
+(Link) https://2fa.fb.tools/IMW4RUJ3TD4JLN3ZNSVQR4FW6IYNJWXD  
+
+(Email)
+ruyimuyup53@gmail.com
+(Pass)
+15084Lyn4pZwT
+(Link)
+https://2fa.fb.tools/WRDKCM7L3324LN7A65VXXM2CHXGQ64OR
+[ขั้นตอนที่1 เข้าเมล]
+[ขั้นตอนที่2 ใส่รหัส]
+[ขั้นตอนที่3 กดลิงก์และคัดลอกรหัส 6 หลัก ไปใส่ใน Authenticator]
+
+(Email)
+evosimotone103@gmail.com
+(Pass)
+heCVaq1PnrRS
+(Link)
+https://2fa.fb.tools/HBDILLAPERYU5XX2UUJVPUHSN7DX55DJ
+[ขั้นตอนที่1 เข้าเมล]
+[ขั้นตอนที่2 ใส่รหัส]
+[ขั้นตอนที่3 กดลิงก์และคัดลอกรหัส 6 หลัก ไปใส่ใน Authenticator]
+
+
+(Email)
+olujuxawihu78@gmail.com
+(Pass)
+k45Ff6tJ7jU23
+(Link)
+https://2fa.fb.tools/73L7VTQ2A6KBQ4CG3FSNA2ZP5XBXTLKD
+[ขั้นตอนที่1 เข้าเมล]
+[ขั้นตอนที่2 ใส่รหัส]
+[ขั้นตอนที่3 กดลิงก์และคัดลอกรหัส 6 หลัก ไปใส่ใน Authenticator]
+
+(Email)
+izofohonujur89@gmail.com
+(Pass)
+Hac80y4bixyq2P
+(Link)
+https://2fa.fb.tools/UW5665MKMC3IP6N25JU73YSUCQ45MOS6
+[ขั้นตอนที่1 เข้าเมล]
+[ขั้นตอนที่2 ใส่รหัส]
+[ขั้นตอนที่3 กดลิงก์และคัดลอกรหัส 6 หลัก ไปใส่ใน Authenticator]
+
+
+Email : ocosigon164@gmail.com  
+Pass : deGmm6bvw4CSdyD  
+Link : https://2fa.fb.tools/Y3NLFCBG64UUK6Y2E2XYJZPXEZTKEOV5  
+
+Email : qicedukifi76@gmail.com  
+Pass : 6QWey5yYuxJc0  
+Link : https://2fa.fb.tools/E2A3TPELYFKO7XGMATRPY3ZVPL36Q4Y5  
+
+Email : iwunatuy15@gmail.com  
+Pass : PwXa9kxu9EAyvcT  
+Link : https://2fa.fb.tools/4ONIW3AUAMJY65LY2NFOAW53SV53WTFP  
+
+Email : oniteqiru67@gmail.com  
+Pass : 19Lprmy9gvC3  
+Link : https://2fa.fb.tools/6WYIGELTZFOR5UQFL27N7DXDYWCQPC5U  
+
+Email : rerajena51@gmail.com  
+Pass : QhNRVG09GSp4  
+Link : https://2fa.fb.tools/YJP3ZSGTW7ROFZNF33WGEVPJ52GZOD6K  
+
+
+
+
+    </textarea>
+    
+    <button class="btn-generate" onclick="parseData()">🚀 สร้างชุดข้อมูล / โหลดข้อมูลที่ฝังไว้</button>
+
+    <div class="search-container" id="searchContainer">
+        <input type="text" id="searchInput" placeholder="🔍 กรอกอีเมลที่ต้องการค้นหา..." onkeypress="handleEnter(event)">
+        <button class="btn-search" onclick="searchAccount()">ค้นหา</button>
+        <button class="btn-clear" onclick="clearSearch()">แสดงทั้งหมด</button>
+    </div>
+
+    <div id="outputArea"></div>
+</div>
+
+<script>
+    let allAccounts = [];
+
+    // --- ระบบ Theme ---
+    function toggleTheme() {
+        const body = document.documentElement;
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+    // --- แยกข้อมูล ---
+    function parseData() {
+        const text = document.getElementById('inputText').value;
+        const normalizedText = text.replace(/(?:\(\s*Email\s*\)|Email\s*:)/gi, '|||ACCOUNT_SPLIT|||');
+        const accountBlocks = normalizedText.split('|||ACCOUNT_SPLIT|||');
+        
+        allAccounts = [];
+
+        accountBlocks.forEach(block => {
+            if (!block.trim()) return;
+            const emailMatch = block.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+            const passMatch = block.match(/(?:\(\s*Pass\s*\)|Pass\s*:)\s*([^\s]+)/i);
+            const linkMatch = block.match(/(https?:\/\/[^\s]+)/i);
+
+            if (emailMatch && passMatch && linkMatch) {
+                allAccounts.push({
+                    id: allAccounts.length + 1,
+                    email: emailMatch[1].trim(),
+                    pass: passMatch[1].trim(),
+                    link: linkMatch[1].trim()
+                });
+            }
+        });
+
+        document.getElementById('searchContainer').style.display = allAccounts.length > 0 ? 'flex' : 'none';
+        renderAccounts(allAccounts);
+    }
+
+    // --- แสดงผลบัญชี ---
+    function renderAccounts(accountsToDisplay) {
+        const outputArea = document.getElementById('outputArea');
+        outputArea.innerHTML = ''; 
+
+        if (accountsToDisplay.length === 0) {
+            outputArea.innerHTML = '<div class="no-result">❌ ไม่พบข้อมูลบัญชีที่คุณค้นหา</div>';
+            return;
+        }
+
+        const groupSize = 10;
+        for (let i = 0; i < accountsToDisplay.length; i += groupSize) {
+            const groupAccounts = accountsToDisplay.slice(i, i + groupSize);
+            const groupIndex = Math.floor(i / groupSize) + 1;
+
+            const groupWrapper = document.createElement('div');
+            groupWrapper.className = 'group-wrapper';
+
+            const isSearching = accountsToDisplay.length !== allAccounts.length;
+            const headerTitle = isSearching ? `🎯 ผลการค้นหา (${accountsToDisplay.length} รายการ)` : `📁 กลุ่มที่ ${groupIndex}`;
+
+            const groupHeader = document.createElement('div');
+            groupHeader.className = 'group-header';
+            groupHeader.innerHTML = `<span>${headerTitle}</span><span class="toggle-icon">▼</span>`;
+
+            const groupContent = document.createElement('div');
+            groupContent.className = 'group-content';
+
+            groupAccounts.forEach(acc => {
+                const card = document.createElement('div');
+                card.className = 'account-card';
+                card.innerHTML = `
+                    <div style="margin-bottom:10px; font-weight:600; color:var(--tag-text)">บัญชีที่ #${acc.id} <span style="color:var(--primary); font-weight:400; font-size: 14px; margin-left: 5px;">(${acc.email})</span></div>
+                    <div class="button-group">
+                        <button class="btn-email" onclick="handleCopy(this, '${acc.email}', 'Email')">📧 คัดลอก Email</button>
+                        <button class="btn-pass" onclick="handleCopy(this, '${acc.pass}', 'Pass')">🔑 คัดลอก Pass</button>
+                        <button class="btn-link" onclick="handleGet2FA(this, '${acc.link}')">🔐 สร้าง & คัดลอก 2FA</button>
+                    </div>
+                `;
+                groupContent.appendChild(card);
+            });
+
+            const groupFooter = document.createElement('div');
+            groupFooter.className = 'group-footer';
+            groupFooter.innerHTML = `▲ กดย่อกลุ่ม`;
+
+            const toggleGroup = () => {
+                groupWrapper.classList.toggle('is-collapsed');
+                groupHeader.querySelector('.toggle-icon').innerHTML = groupWrapper.classList.contains('is-collapsed') ? '▶' : '▼';
+            };
+
+            groupHeader.onclick = toggleGroup;
+            groupFooter.onclick = () => { toggleGroup(); groupHeader.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
+
+            groupWrapper.appendChild(groupHeader);
+            groupWrapper.appendChild(groupContent);
+            groupWrapper.appendChild(groupFooter);
+            outputArea.appendChild(groupWrapper);
+        }
+    }
+
+    // --- ระบบค้นหา ---
+    function searchAccount() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+        if (!keyword) { renderAccounts(allAccounts); return; }
+        renderAccounts(allAccounts.filter(acc => acc.email.toLowerCase().includes(keyword)));
+    }
+    function clearSearch() { document.getElementById('searchInput').value = ''; renderAccounts(allAccounts); }
+    function handleEnter(e) { if (e.key === 'Enter') searchAccount(); }
+
+    // --- คัดลอกพื้นฐาน ---
+    function handleCopy(btn, text, label) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.innerHTML = '✔️ คัดลอกแล้ว';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.classList.add('visited');
+                btn.innerHTML = `✓ ${label} (Done)`;
+            }, 800);
+        });
+    }
+
+    // ==========================================
+    // --- ระบบ 2FA Real-Time (นับถอยหลัง 30 วิ) ---
+    // ==========================================
+
+    async function handleGet2FA(btn, url) {
+        // 1. ดึง Secret Key
+        const urlParts = url.split('/');
+        let secret = urlParts[urlParts.length - 1].trim().replace(/[^A-Z2-7]/ig, '').toUpperCase();
+        
+        if (!secret) {
+            alert("ไม่พบ Secret Key เปิดหน้าต่างเว็บแทน");
+            window.open(url, '_blank');
+            return;
+        }
+
+        // 2. คำนวณรหัสปัจจุบัน
+        const otp = await generateTOTP(secret);
+        
+        // 3. คัดลอกลง Clipboard ทันที
+        navigator.clipboard.writeText(otp).then(() => {
+            // ตั้งค่าสถานะว่าปุ่มนี้เริ่มนับเวลาแล้ว
+            btn.classList.add('active-2fa');
+            btn.setAttribute('data-secret', secret);
+            btn.setAttribute('data-current-otp', otp);
+            
+            // แสดงสถานะคัดลอกชั่วคราว (ไม่ให้เวลาที่เดินอยู่มาทับข้อความคัดลอก)
+            btn.classList.add('just-copied', 'copied');
+            btn.innerHTML = `✔️ คัดลอกแล้ว: ${otp}`;
+            
+            setTimeout(() => {
+                btn.classList.remove('copied', 'just-copied');
+                btn.classList.add('visited');
+                updateAllActive2FA(); // สั่งให้อัปเดต UI ให้เป็นเวลานับถอยหลัง
+            }, 1500);
+        });
+    }
+
+    // ฟังก์ชันคำนวณรหัส 6 หลัก (ใช้มาตรฐาน HMAC-SHA1 แบบเดียวกับแอป Authenticator)
+    async function generateTOTP(secret) {
+        const base32chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        let bits = '';
+        for (let i = 0; i < secret.length; i++) {
+            let val = base32chars.indexOf(secret.charAt(i));
+            if (val === -1) continue;
+            bits += val.toString(2).padStart(5, '0');
+        }
+        let hex = '';
+        for (let i = 0; i < bits.length - 3; i += 4) {
+            hex += parseInt(bits.substr(i, 4), 2).toString(16);
+        }
+        if (hex.length % 2 !== 0) hex += '0';
+
+        let key = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < hex.length; i += 2) key[i / 2] = parseInt(hex.substr(i, 2), 16);
+
+        const time = Math.floor(Date.now() / 1000 / 30);
+        const timeHex = time.toString(16).padStart(16, '0');
+        let timeBytes = new Uint8Array(8);
+        for (let i = 0; i < 16; i += 2) timeBytes[i / 2] = parseInt(timeHex.substr(i, 2), 16);
+
+        const cryptoKey = await crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
+        const signature = await crypto.subtle.sign('HMAC', cryptoKey, timeBytes);
+        const hash = new Uint8Array(signature);
+
+        const offset = hash[hash.length - 1] & 0xf;
+        const binary = ((hash[offset] & 0x7f) << 24) | ((hash[offset + 1] & 0xff) << 16) | ((hash[offset + 2] & 0xff) << 8) | (hash[offset + 3] & 0xff);
+        return (binary % 1000000).toString().padStart(6, '0');
+    }
+
+    // ลูปที่จะทำงานทุก 1 วินาที เพื่ออัปเดตปุ่ม 2FA ทั้งหมดที่ถูกเปิดใช้งานแล้ว
+    async function updateAllActive2FA() {
+        const time = Math.floor(Date.now() / 1000);
+        const timeLeft = 30 - (time % 30); // เวลาที่เหลือ (30 ถึง 1)
+        
+        const activeBtns = document.querySelectorAll('.active-2fa');
+        for (let btn of activeBtns) {
+            // ถ้าปุ่มกำลังแสดงคำว่า "✔️ คัดลอกแล้ว" ให้ข้ามการอัปเดตตัวหนังสือไปก่อน
+            if (btn.classList.contains('just-copied')) continue;
+
+            const secret = btn.getAttribute('data-secret');
+            const otp = await generateTOTP(secret);
+            
+            // อัปเดตตัวเลขและเวลาบนปุ่ม (เช่น 📋 123456 (25s))
+            btn.innerHTML = `📋 ${otp} (${timeLeft}s)`;
+            btn.setAttribute('data-current-otp', otp);
+        }
+    }
+
+    // เริ่มทำงานระบบนับเวลาแบบเรียลไทม์
+    setInterval(updateAllActive2FA, 1000);
+
+</script>
+
+</body>
+</html>
