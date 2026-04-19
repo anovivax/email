@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เครื่องมือจัดการบัญชี & 2FA</title>
+    <title>เครื่องมือจัดการบัญชี & ข้อมูลติดต่อ</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,10 +18,10 @@
             --tag-text: #6b7280;
             --email-btn: #3b82f6;    
             --pass-btn: #8b5cf6;     
-            --link-btn: #0ea5e9;     
+            --fixed-email-btn: #0891b2; /* สีปุ่มอีเมลคงที่ */
+            --fixed-phone-btn: #059669; /* สีปุ่มเบอร์โทรคงที่ */
             --success: #10b981;      
             --visited: #64748b;      
-            --warning: #f59e0b;
         }
 
         [data-theme="dark"] {
@@ -128,12 +128,14 @@
         .account-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
         .account-card:last-child { margin-bottom: 0; }
 
-        .button-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-        .button-group button { padding: 12px 10px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt', sans-serif; font-weight: 500; transition: all 0.2s; }
+        /* ปรับให้รองรับ 4 ปุ่มได้อย่างสวยงาม */
+        .button-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+        .button-group button { padding: 12px 10px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt', sans-serif; font-weight: 500; font-size: 13.5px; transition: all 0.2s; }
 
         .btn-email { background-color: var(--email-btn); color: white; }
         .btn-pass { background-color: var(--pass-btn); color: white; }
-        .btn-link { background-color: var(--link-btn); color: white; }
+        .btn-fixed-email { background-color: var(--fixed-email-btn); color: white; }
+        .btn-fixed-phone { background-color: var(--fixed-phone-btn); color: white; }
 
         .copied { background-color: var(--success) !important; color: white !important; }
         .visited { background-color: var(--visited) !important; color: white !important; }
@@ -146,12 +148,11 @@
 
 <div class="container">
     <div class="header-top">
-        <h2>✨ เครื่องมือจัดการข้อมูล & ค้นหา</h2>
+        <h2>✨ เครื่องมือจัดการข้อมูลบัญชี & ค้นหา</h2>
         <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()">🌙</button>
     </div>
     
     <textarea id="inputText" placeholder="วางข้อมูลที่นี่...">
-
 Email : BeavinMaclennan@gmail.com
 Pass : PamelaDiaz@9054
 Link : https://2fa.fb.tools/BIVNBBZ6Q6DZVTCGCWEBPKITACO653QD
@@ -164,118 +165,10 @@ Email : BolanosParonto@gmail.com
 Pass : DerrickHughes@4915
 Link : https://2fa.fb.tools/ABHK7FIHL44FDLXBXUFYVDWKGS2DLJIV
 -----------------------------------
-Email : TrettinHink@gmail.com
-Pass : MilaCantu@3425
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
-Email : hsbdh827373@gmail.com
-Pass : ubsuhs827373@
-Link : https://2fa.fb.tools/G3PLYB7HBE6I3X7ZBEYFMODIB6AZALSE
------------------------------------
-Email : hungnguyen76287@gmail.com
-Pass : YWZZdHu4l88DZ3I0i
-Link : https://2fa.fb.tools/3QQ4WX7AFL3JJLY2XQJMD4M3IODE6YUF
------------------------------------
-Email : uqamuzisepo378@gmail.com
-Pass : zSe7pF7moPMn
-Link : https://2fa.fb.tools/SY47BRD2FWFZGLIWE5Z5FUTGGQD26QF2
------------------------------------
-Email : atetohocaku859@gmail.com
-Pass : ZkdrHaEWQ9M0FOi
-Link : https://2fa.fb.tools/473MS75WWS2LID4NFLZV5NYJBTHHVCWI
------------------------------------
-Email : imigevodiyi273@gmail.com
-Pass : sHFES2NlrbNfula
-Link : https://2fa.fb.tools/VABGIUP5GANEUJC2NFBTJJEUZCMVV2QW
------------------------------------
-Email : zuwewedu386@gmail.com
-Pass : tXWP2sezR9P00ve
-Link : https://2fa.fb.tools/SU7NSUJ2VKK5FZUQYVZ2FUS5AALW4474
------------------------------------
-Email : umaricuv14@gmail.com
-Pass : jUwt29053iI1I
-Link : https://2fa.fb.tools/JKGQ7RVTHMBCNOKHCYJRAWHRXKEHLGQ4
------------------------------------
-Email : poqokege973@gmail.com
-Pass : 5QSS4EywXMRK
-Link : https://2fa.fb.tools/3CYSCC7AA2TPT46Q7VCE2YR2HKC3MXDN
------------------------------------
-Email : arojomukoyim69@gmail.com
-Pass : cjIqUJnjaifM
-Link : https://2fa.fb.tools/ZLUMWAOUPVVMTXHQ7746BTEAKL7PRCL7
------------------------------------
-Email : usahaqew459@gmail.com
-Pass : gpj5EtByIkk1aui
-Link : https://2fa.fb.tools/Y5RBXY2AL4TXIYTQKEKGJGKY76HSJDJC
------------------------------------
-Email : ogoziyiqo056@gmail.com
-Pass : aIOGHxDMlkRgcu
-Link : https://2fa.fb.tools/IB3DB6QYNA4Z45RK2E5TSMQODME3EKQY
------------------------------------
-Email : mebefutuki77@gmail.com
-Pass : Jtw4RQrV7XbF
-Link : https://2fa.fb.tools/ANATWUBDSTLIA3O4Y6566ZNQ7243EDW7
------------------------------------
-Email : fiyusaqag918@gmail.com
-Pass : cxMO0HHeqCoAq
-Link : https://2fa.fb.tools/VFAZUORJGSVBE5V6GM3ZHSATYWGEGFQ2
------------------------------------
-Email : musefopa933@gmail.com
-Pass : 9BJYgPDlXbVsu
-Link : https://2fa.fb.tools/BBUC7TXWLBRJUNAZVF6C4SQZ3FIJYM4R
------------------------------------
-Email : odokiner42@gmail.com
-Pass : BCBlZIMWVKd4Y
-Link : https://2fa.fb.tools/XK3JQ3SEIOY3PWP2HETBKKI2DDWO2XTE
------------------------------------
-Email : korexud743@gmail.com
-Pass : l93U6vdX8Jem
-Link : https://2fa.fb.tools/Y2C3OEUKIMYAP3KIOYHJWGLD3FHQBK7F
------------------------------------
-Email : zefawugaja22@gmail.com
-Pass : LwpIC3AkaVhsj2
-Link : https://2fa.fb.tools/UQP4VTLEC2UUY5NB5K7AZZ5A4M6IOQGT
------------------------------------
-Email : anoxixallv@gmail.com
-Pass : afif30834
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
-Email : axovivas@gmail.com
-Pass : afif30834
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
 Email : siverlcraft@gmail.com
 Pass : 0831563612
 Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
 -----------------------------------
-Email : axovivol@gmail.com
-Pass : afif30834
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
-Email : siverlxlcraft@gmail.com
-Pass : 0831563612
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
-Email : anoxixos@gmail.com
-Pass : afif30834
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
-Email : sivermcraft@gmail.com
-Pass : 0831563612
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
-Email : anoxixolls@gmail.com
-Pass : afif30834
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
-Email : anoxixallz@gmail.com
-Pass : afif30834
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
------------------------------------
-
-
-
-
     </textarea>
     
     <button class="btn-generate" onclick="parseData()">🚀 สร้างชุดข้อมูล / โหลดข้อมูลที่ฝังไว้</button>
@@ -305,7 +198,7 @@ Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
     }
     if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
-    // --- แยกข้อมูล ---
+    // --- แยกข้อมูล (ดึงเฉพาะ Email และ Password) ---
     function parseData() {
         const text = document.getElementById('inputText').value;
         const normalizedText = text.replace(/(?:\(\s*Email\s*\)|Email\s*:)/gi, '|||ACCOUNT_SPLIT|||');
@@ -317,14 +210,13 @@ Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
             if (!block.trim()) return;
             const emailMatch = block.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
             const passMatch = block.match(/(?:\(\s*Pass\s*\)|Pass\s*:)\s*([^\s]+)/i);
-            const linkMatch = block.match(/(https?:\/\/[^\s]+)/i);
 
-            if (emailMatch && passMatch && linkMatch) {
+            // บันทึกเฉพาะข้อมูลที่มี Email และ Password (ข้าม Link ไปได้เลย)
+            if (emailMatch && passMatch) {
                 allAccounts.push({
                     id: allAccounts.length + 1,
                     email: emailMatch[1].trim(),
-                    pass: passMatch[1].trim(),
-                    link: linkMatch[1].trim()
+                    pass: passMatch[1].trim()
                 });
             }
         });
@@ -364,12 +256,14 @@ Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
             groupAccounts.forEach(acc => {
                 const card = document.createElement('div');
                 card.className = 'account-card';
+                // เพิ่ม 2 ปุ่มตายตัว คือ siverlcraft@gmail.com และ +6663-421-6944
                 card.innerHTML = `
                     <div style="margin-bottom:10px; font-weight:600; color:var(--tag-text)">บัญชีที่ #${acc.id} <span style="color:var(--primary); font-weight:400; font-size: 14px; margin-left: 5px;">(${acc.email})</span></div>
                     <div class="button-group">
-                        <button class="btn-email" onclick="handleCopy(this, '${acc.email}', 'Email')">📧 คัดลอก Email</button>
-                        <button class="btn-pass" onclick="handleCopy(this, '${acc.pass}', 'Pass')">🔑 คัดลอก Pass</button>
-                        <button class="btn-link" onclick="handleGet2FA(this, '${acc.link}')">🔐 สร้าง & คัดลอก 2FA</button>
+                        <button class="btn-email" onclick="handleCopy(this, '${acc.email}', 'คัดลอก Email แล้ว')">📧 คัดลอก Email</button>
+                        <button class="btn-pass" onclick="handleCopy(this, '${acc.pass}', 'คัดลอก Pass แล้ว')">🔑 คัดลอก Pass</button>
+                        <button class="btn-fixed-email" onclick="handleCopy(this, 'siverlcraft@gmail.com', 'คัดลอกอีเมลสำรองแล้ว')">📧 siverlcraft@gmail.com</button>
+                        <button class="btn-fixed-phone" onclick="handleCopy(this, '+66634216944', 'คัดลอกเบอร์โทรแล้ว')">📱 +66634216944</button>
                     </div>
                 `;
                 groupContent.appendChild(card);
@@ -403,109 +297,21 @@ Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
     function clearSearch() { document.getElementById('searchInput').value = ''; renderAccounts(allAccounts); }
     function handleEnter(e) { if (e.key === 'Enter') searchAccount(); }
 
-    // --- คัดลอกพื้นฐาน ---
-    function handleCopy(btn, text, label) {
+    // --- ระบบคัดลอกข้อความ ---
+    function handleCopy(btn, text, successMsg) {
+        // บันทึกข้อความเดิมของปุ่มไว้
+        const originalText = btn.innerHTML;
+        
         navigator.clipboard.writeText(text).then(() => {
-            btn.innerHTML = '✔️ คัดลอกแล้ว';
+            btn.innerHTML = `✔️ ${successMsg}`;
             btn.classList.add('copied');
             setTimeout(() => {
                 btn.classList.remove('copied');
                 btn.classList.add('visited');
-                btn.innerHTML = `✓ ${label} (Done)`;
+                btn.innerHTML = originalText + ' (Done)'; // เพิ่มคำว่า (Done) ต่อท้ายข้อความเดิม
             }, 800);
         });
     }
-
-    // ==========================================
-    // --- ระบบ 2FA Real-Time (นับถอยหลัง 30 วิ) ---
-    // ==========================================
-
-    async function handleGet2FA(btn, url) {
-        // 1. ดึง Secret Key
-        const urlParts = url.split('/');
-        let secret = urlParts[urlParts.length - 1].trim().replace(/[^A-Z2-7]/ig, '').toUpperCase();
-        
-        if (!secret) {
-            alert("ไม่พบ Secret Key เปิดหน้าต่างเว็บแทน");
-            window.open(url, '_blank');
-            return;
-        }
-
-        // 2. คำนวณรหัสปัจจุบัน
-        const otp = await generateTOTP(secret);
-        
-        // 3. คัดลอกลง Clipboard ทันที
-        navigator.clipboard.writeText(otp).then(() => {
-            // ตั้งค่าสถานะว่าปุ่มนี้เริ่มนับเวลาแล้ว
-            btn.classList.add('active-2fa');
-            btn.setAttribute('data-secret', secret);
-            btn.setAttribute('data-current-otp', otp);
-            
-            // แสดงสถานะคัดลอกชั่วคราว (ไม่ให้เวลาที่เดินอยู่มาทับข้อความคัดลอก)
-            btn.classList.add('just-copied', 'copied');
-            btn.innerHTML = `✔️ คัดลอกแล้ว: ${otp}`;
-            
-            setTimeout(() => {
-                btn.classList.remove('copied', 'just-copied');
-                btn.classList.add('visited');
-                updateAllActive2FA(); // สั่งให้อัปเดต UI ให้เป็นเวลานับถอยหลัง
-            }, 1500);
-        });
-    }
-
-    // ฟังก์ชันคำนวณรหัส 6 หลัก (ใช้มาตรฐาน HMAC-SHA1 แบบเดียวกับแอป Authenticator)
-    async function generateTOTP(secret) {
-        const base32chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        let bits = '';
-        for (let i = 0; i < secret.length; i++) {
-            let val = base32chars.indexOf(secret.charAt(i));
-            if (val === -1) continue;
-            bits += val.toString(2).padStart(5, '0');
-        }
-        let hex = '';
-        for (let i = 0; i < bits.length - 3; i += 4) {
-            hex += parseInt(bits.substr(i, 4), 2).toString(16);
-        }
-        if (hex.length % 2 !== 0) hex += '0';
-
-        let key = new Uint8Array(hex.length / 2);
-        for (let i = 0; i < hex.length; i += 2) key[i / 2] = parseInt(hex.substr(i, 2), 16);
-
-        const time = Math.floor(Date.now() / 1000 / 30);
-        const timeHex = time.toString(16).padStart(16, '0');
-        let timeBytes = new Uint8Array(8);
-        for (let i = 0; i < 16; i += 2) timeBytes[i / 2] = parseInt(timeHex.substr(i, 2), 16);
-
-        const cryptoKey = await crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
-        const signature = await crypto.subtle.sign('HMAC', cryptoKey, timeBytes);
-        const hash = new Uint8Array(signature);
-
-        const offset = hash[hash.length - 1] & 0xf;
-        const binary = ((hash[offset] & 0x7f) << 24) | ((hash[offset + 1] & 0xff) << 16) | ((hash[offset + 2] & 0xff) << 8) | (hash[offset + 3] & 0xff);
-        return (binary % 1000000).toString().padStart(6, '0');
-    }
-
-    // ลูปที่จะทำงานทุก 1 วินาที เพื่ออัปเดตปุ่ม 2FA ทั้งหมดที่ถูกเปิดใช้งานแล้ว
-    async function updateAllActive2FA() {
-        const time = Math.floor(Date.now() / 1000);
-        const timeLeft = 30 - (time % 30); // เวลาที่เหลือ (30 ถึง 1)
-        
-        const activeBtns = document.querySelectorAll('.active-2fa');
-        for (let btn of activeBtns) {
-            // ถ้าปุ่มกำลังแสดงคำว่า "✔️ คัดลอกแล้ว" ให้ข้ามการอัปเดตตัวหนังสือไปก่อน
-            if (btn.classList.contains('just-copied')) continue;
-
-            const secret = btn.getAttribute('data-secret');
-            const otp = await generateTOTP(secret);
-            
-            // อัปเดตตัวเลขและเวลาบนปุ่ม (เช่น 📋 123456 (25s))
-            btn.innerHTML = `📋 ${otp} (${timeLeft}s)`;
-            btn.setAttribute('data-current-otp', otp);
-        }
-    }
-
-    // เริ่มทำงานระบบนับเวลาแบบเรียลไทม์
-    setInterval(updateAllActive2FA, 1000);
 
 </script>
 
