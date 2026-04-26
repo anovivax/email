@@ -18,13 +18,12 @@
             --tag-text: #6b7280;
             --email-btn: #3b82f6;    
             --pass-btn: #8b5cf6;     
+            --recovery-btn: #f59e0b; /* สีสำหรับปุ่ม Recovery */
             --fixed-email-btn: #0891b2; /* สีปุ่มอีเมลคงที่ */
             --fixed-phone-btn: #059669; /* สีปุ่มเบอร์โทรคงที่ */
             --success: #10b981;      
             --visited: #64748b;      
-        }
-
-        [data-theme="dark"] {
+        }[data-theme="dark"] {
             --bg-color: #111827;     
             --card-bg: #1f2937;      
             --text-main: #f9fafb;    
@@ -128,12 +127,13 @@
         .account-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
         .account-card:last-child { margin-bottom: 0; }
 
-        /* ปรับให้รองรับ 4 ปุ่มได้อย่างสวยงาม */
-        .button-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+        /* ปรับให้รองรับปุ่มได้อย่างสวยงาม */
+        .button-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
         .button-group button { padding: 12px 10px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Prompt', sans-serif; font-weight: 500; font-size: 13.5px; transition: all 0.2s; }
 
         .btn-email { background-color: var(--email-btn); color: white; }
         .btn-pass { background-color: var(--pass-btn); color: white; }
+        .btn-recovery { background-color: var(--recovery-btn); color: white; }
         .btn-fixed-email { background-color: var(--fixed-email-btn); color: white; }
         .btn-fixed-phone { background-color: var(--fixed-phone-btn); color: white; }
 
@@ -153,6 +153,11 @@
     </div>
     
     <textarea id="inputText" placeholder="วางข้อมูลที่นี่...">
+(Email) bublikcombh@gmail.com
+(Pass) 8swtry9Vk
+(Recovery) bublikcombh5823@wishy.fr
+(Link 2FA) -
+-----------------------------------
 Email : BeavinMaclennan@gmail.com
 Pass : PamelaDiaz@9054
 Link : https://2fa.fb.tools/BIVNBBZ6Q6DZVTCGCWEBPKITACO653QD
@@ -160,14 +165,6 @@ Link : https://2fa.fb.tools/BIVNBBZ6Q6DZVTCGCWEBPKITACO653QD
 Email : AnokhinaDanrley311@gmail.com
 Pass : AlexisCase@7212
 Link : https://2fa.fb.tools/XUGKBM5Q3G76OACYZ4UJMNB425AJGH5J
------------------------------------
-Email : BolanosParonto@gmail.com
-Pass : DerrickHughes@4915
-Link : https://2fa.fb.tools/ABHK7FIHL44FDLXBXUFYVDWKGS2DLJIV
------------------------------------
-Email : siverlcraft@gmail.com
-Pass : 0831563612
-Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
 -----------------------------------
     </textarea>
     
@@ -183,7 +180,7 @@ Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
 </div>
 
 <script>
-    let allAccounts = [];
+    let allAccounts =[];
 
     // --- ระบบ Theme ---
     function toggleTheme() {
@@ -198,25 +195,27 @@ Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
     }
     if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
-    // --- แยกข้อมูล (ดึงเฉพาะ Email และ Password) ---
+    // --- แยกข้อมูล (ดึงเฉพาะ Email, Password, และ Recovery) ---
     function parseData() {
         const text = document.getElementById('inputText').value;
         const normalizedText = text.replace(/(?:\(\s*Email\s*\)|Email\s*:)/gi, '|||ACCOUNT_SPLIT|||');
         const accountBlocks = normalizedText.split('|||ACCOUNT_SPLIT|||');
         
-        allAccounts = [];
+        allAccounts =[];
 
         accountBlocks.forEach(block => {
             if (!block.trim()) return;
             const emailMatch = block.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
             const passMatch = block.match(/(?:\(\s*Pass\s*\)|Pass\s*:)\s*([^\s]+)/i);
+            const recoveryMatch = block.match(/(?:\(\s*Recovery\s*\)|Recovery\s*:)\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
 
-            // บันทึกเฉพาะข้อมูลที่มี Email และ Password (ข้าม Link ไปได้เลย)
+            // บันทึกเฉพาะข้อมูลที่มี Email และ Password
             if (emailMatch && passMatch) {
                 allAccounts.push({
                     id: allAccounts.length + 1,
                     email: emailMatch[1].trim(),
-                    pass: passMatch[1].trim()
+                    pass: passMatch[1].trim(),
+                    recovery: recoveryMatch ? recoveryMatch[1].trim() : null // ถ้ามีจะเก็บไว้ ถ้าไม่มีจะเป็น null
                 });
             }
         });
@@ -256,12 +255,19 @@ Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
             groupAccounts.forEach(acc => {
                 const card = document.createElement('div');
                 card.className = 'account-card';
-                // เพิ่ม 2 ปุ่มตายตัว คือ siverlcraft@gmail.com และ +6663-421-6944
+                
+                // เช็คว่าถ้ามี Recovery จะเพิ่มปุ่มนี้เข้าไป
+                let recoveryBtnHtml = '';
+                if (acc.recovery) {
+                    recoveryBtnHtml = `<button class="btn-recovery" onclick="handleCopy(this, '${acc.recovery}', 'คัดลอก Recovery แล้ว')">🛡️ คัดลอก Recovery</button>`;
+                }
+
                 card.innerHTML = `
                     <div style="margin-bottom:10px; font-weight:600; color:var(--tag-text)">บัญชีที่ #${acc.id} <span style="color:var(--primary); font-weight:400; font-size: 14px; margin-left: 5px;">(${acc.email})</span></div>
                     <div class="button-group">
                         <button class="btn-email" onclick="handleCopy(this, '${acc.email}', 'คัดลอก Email แล้ว')">📧 คัดลอก Email</button>
                         <button class="btn-pass" onclick="handleCopy(this, '${acc.pass}', 'คัดลอก Pass แล้ว')">🔑 คัดลอก Pass</button>
+                        ${recoveryBtnHtml}
                         <button class="btn-fixed-email" onclick="handleCopy(this, 'siverlcraft@gmail.com', 'คัดลอกอีเมลสำรองแล้ว')">📧 siverlcraft@gmail.com</button>
                         <button class="btn-fixed-phone" onclick="handleCopy(this, '+66634216944', 'คัดลอกเบอร์โทรแล้ว')">📱 +66634216944</button>
                     </div>
@@ -300,7 +306,7 @@ Link : https://2fa.fb.tools/YFLI37AAA7JU3FB4PLNUVZLW6SQ64VRQ
     // --- ระบบคัดลอกข้อความ ---
     function handleCopy(btn, text, successMsg) {
         // บันทึกข้อความเดิมของปุ่มไว้
-        const originalText = btn.innerHTML;
+        const originalText = btn.innerHTML.split(' (Done)')[0]; // ตัด (Done) อันเก่าทิ้งเผื่อผู้ใช้กดซ้ำ
         
         navigator.clipboard.writeText(text).then(() => {
             btn.innerHTML = `✔️ ${successMsg}`;
